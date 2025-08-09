@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Os Números e suas Quantidades</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f0f8ff;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  section {
+    display: none;
+  }
+  section.active {
+    display: block;
+  }
+  /* Menu */
+  #menuSection {
+    max-width: 400px;
+    margin: 0 auto;
+    border: 2px solid #0077cc;
+    border-radius: 8px;
+    background: white;
+    padding: 15px;
+  }
+  #menuSection > div {
+    margin-bottom: 20px;
+  }
+  #explanation {
+    font-size: 0.9em;
+    color: #333;
+  }
+  #circleNumbers {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: #e1ecf9;
+  }
+  #circleNumbers div {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    border-radius: 50%;
+    background: #0077cc;
+    color: white;
+    font-weight: bold;
+    user-select: none;
+  }
+  #menuControls {
+    text-align: center;
+  }
+  #menuControls input[type="text"] {
+    padding: 8px;
+    font-size: 1em;
+    width: 90%;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  #menuControls button {
+    width: 120px;
+    margin: 5px;
+    padding: 10px;
+    font-size: 1em;
+    border-radius: 6px;
+    border: none;
+    background: #0077cc;
+    color: white;
+    cursor: pointer;
+  }
+  #menuControls button:hover {
+    background: #005fa3;
+  }
+  /* Jogos (níveis 1 e 2) */
+  .game-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border: 2px solid #0077cc;
+    border-radius: 8px;
+    padding: 15px;
+  }
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+  .game-header div {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
+  }
+  .instructions {
+    margin-bottom: 15px;
+    font-size: 0.95em;
+    color: #444;
+    text-align: center;
+  }
+  /* Prancheta e cartas */
+  .center-section {
+    display: flex;
+    justify-content: space-between;
+  }
+  .left-panel, .right-panel {
+    border: 2px solid #0077cc;
+    border-radius: 6px;
+    padding: 10px;
+  }
+  .left-panel {
+    width: 150px;
+    text-align: center;
+  }
+  .right-panel {
+    background: #f9faff;
+    border: 2px solid #0077cc;
+    border-radius: 6px;
+    padding: 10px;
+  }
+  .prancheta {
+    display: grid;
+    gap: 5px;
+    background: #dbe9ff;
+    padding: 10px;
+    border-radius: 6px;
+  }
+  .prancheta-cell {
+    background: #ffffff;
+    border: 1px solid #0077cc;
+    border-radius: 4px;
+    font-size: 2em;
+    line-height: 75px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  .prancheta-cell.empty {
+    background: #dbe9ff;
+    cursor: default;
+  }
+  .cards-container {
+    display: grid;
+    gap: 8px;
+  }
+  .card {
+    background: #0077cc;
+    color: white;
+    font-size: 1.6em;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .card:focus {
+    outline: 3px solid #ffa500;
+  }
+  /* Central number and buttons */
+  .middle-panel {
+    flex: 1;
+    margin: 0 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #currentNumber {
+    font-size: 3em;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  .btn-group {
+    margin-top: 15px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+  }
+  button.action-btn {
+    background: #0077cc;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  button.action-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+  }
+  button.action-btn:hover:not(:disabled) {
+    background: #005fa3;
+  }
+  /* Mensagem popup */
+  #messageBox {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    background: #0077cc;
+    color: white;
+    padding: 25px 40px;
+    border-radius: 12px;
+    display: none;
+    text-align: center;
+    z-index: 1000;
+  }
+  #messageBox p {
+    font-size: 1.4em;
+    margin-bottom: 15px;
+  }
+  #messageBox button {
+    background: white;
+    color: #0077cc;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  /* Focus outline */
+  button:focus, input:focus {
+    outline: 2px solid #ffa500;
+    outline-offset: 2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- TELA 01 - MENU -->
+<section id="menuSection" class="active" tabindex="0" aria-label="Menu do jogo">
+  <h1>Os Números e suas Quantidades</h1>
+  <div id="explanation" aria-live="polite">
+    Este jogo possui como objetivo exercitar sua mente e a habilidade de associar números a suas quantidades. Coloque seu nome no campo abaixo e escolha seu nível. O nível 01 tem números de 0 a 10. O nível 02 tem números de 1 a 20.
+  </div>
+  <div id="circleNumbers" aria-hidden="true"></div>
+  <div id="menuControls">
+    <label for="playerNameInput">Digite seu nome:</label><br />
+    <input type="text" id="playerNameInput" aria-required="true" autocomplete="off" /><br />
+    <button id="btnLevel1" aria-label="Iniciar Nível Fácil (0 a 10)">Nível Fácil (0 a 10)</button>
+    <button id="btnLevel2" aria-label="Iniciar Nível Médio (1 a 20)">Nível Médio (1 a 20)</button>
+  </div>
+</section>
+
+<!-- TELA 02 - JOGO NÍVEL 01 -->
+<section id="gameLevel1Section" tabindex="0" aria-label="Jogo nível fácil">
+  <h1>Números e suas quantidades - Básico</h1>
+  <div class="game-container">
+    <div class="game-header">
+      <div id="playerNameDisplay1" aria-live="polite">Jogador: </div>
+      <div>Acertos: <span id="correctCount1">0</span></div>
+      <div>Erros: <span id="errorCount1">0</span></div>
+    </div>
+    <div class="instructions" id="instructions1">
+      Orientações: Clique numa figura do lado direito e preencha a quantidade de quadrados no quadro central que corresponda ao número indicado. Depois que conferir a quantidade solicitada clique em "Confirmar Quantidade". Você pode usar somente uma figura ou uma combinação delas.
+    </div>
+    <div class="center-section">
+      <div class="left-panel" aria-label="Informações do jogador e placar">
+        <p id="currentNumber1" style="font-size:2.5em; font-weight:bold;">0</p>
+      </div>
+      <div class="middle-panel">
+        <div id="prancheta1" class="prancheta" aria-label="Prancheta para colocar figuras" role="grid" tabindex="0" style="grid-template-columns: repeat(5, 75px); grid-template-rows: repeat(2, 75px);"></div>
+        <div class="btn-group">
+          <button id="btnConfirm1" class="action-btn">Confirmar Quantidade</button>
+          <button id="btnClear1" class="action-btn">Limpar Prancheta</button>
+          <button id="btnMenu1" class="action-btn">Voltar ao Menu Inicial</button>
+        </div>
+      </div>
+      <div class="right-panel cards-container level1" aria-label="Cartas de veículos para escolher" style="display:grid; grid-template-columns: 1fr; grid-template-rows: repeat(5, 50px); gap:8px; width:60px;">
+        <!-- cartas aparecerão aqui -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TELA 03 - JOGO NÍVEL 02 -->
+<section id="gameLevel2Section" tabindex="0" aria-label="Jogo nível médio">
+  <h1>Números e suas quantidades - Dificuldade Média</h1>
+  <div class="game-container">
+    <div class="game-header">
+      <div id="playerNameDisplay2" aria-live="polite">Jogador: </div>
+      <div>Acertos: <span id="correctCount2">0</span></div>
+      <div>Erros: <span id="errorCount2">0</span></div>
+    </div>
+    <div class="instructions" id="instructions2">
+      Orientações: Clique numa figura do lado direito e preencha a quantidade de quadrados no quadro central que corresponda ao número indicado. Depois que conferir a quantidade solicitada clique em "Confirmar Quantidade". Você pode usar somente uma figura ou uma combinação delas.
+    </div>
+    <div class="center-section">
+      <div class="left-panel" aria-label="Informações do jogador e placar">
+        <p id="currentNumber2" style="font-size:2.5em; font-weight:bold;">0</p>
+      </div>
+      <div class="middle-panel">
+        <div id="prancheta2" class="prancheta" aria-label="Prancheta para colocar figuras" role="grid" tabindex="0" style="grid-template-columns: repeat(5, 75px); grid-template-rows: repeat(4, 75px);"></div>
+        <div class="btn-group">
+          <button id="btnConfirm2" class="action-btn">Confirmar Quantidade</button>
+          <button id="btnClear2" class="action-btn">Limpar Prancheta</button>
+          <button id="btnMenu2" class="action-btn">Voltar ao Menu Inicial</button>
+        </div>
+      </div>
+      <div class="right-panel cards-container level2" aria-label="Cartas de veículos para escolher" style="display:grid; grid-template-columns: 1fr; grid-template-rows: repeat(5, 50px); gap:8px; width:60px;">
+        <!-- cartas aparecerão aqui -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mensagem popup -->
+<div id="messageBox" role="alertdialog" aria-modal="true" aria-labelledby="msgDesc" aria-describedby="msgEmotions" tabindex="-1">
+  <p id="msgDesc"></p>
+  <p id="msgEmotions" style="font-size: 2em; margin: 10px 0;"></p>
+  <button id="msgBtn" aria-label="Fechar mensagem">Fechar</button>
+</div>
+
+<!-- Sons -->
+<audio id="soundCorrect" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+<audio id="soundError" src="https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg"></audio>
+
+<script>
+(() => {
+  // Elementos
+  const menuSection = document.getElementById('menuSection');
+  const gameLevel1Section = document.getElementById('gameLevel1Section');
+  const gameLevel2Section = document.getElementById('gameLevel2Section');
+
+  const playerNameInput = document.getElementById('playerNameInput');
+
+  const playerNameDisplay1 = document.getElementById('playerNameDisplay1');
+  const correctCount1 = document.getElementById('correctCount1');
+  const errorCount1 = document.getElementById('errorCount1');
+  const currentNumber1 = document.getElementById('currentNumber1');
+  const prancheta1 = document.getElementById('prancheta1');
+  const cardsContainer1 = gameLevel1Section.querySelector('.cards-container');
+
+  const playerNameDisplay2 = document.getElementById('playerNameDisplay2');
+  const correctCount2 = document.getElementById('correctCount2');
+  const errorCount2 = document.getElementById('errorCount2');
+  const currentNumber2 = document.getElementById('currentNumber2');
+  const prancheta2 = document.getElementById('prancheta2');
+  const cardsContainer2 = gameLevel2Section.querySelector('.cards-container');
+
+  const btnConfirm1 = document.getElementById('btnConfirm1');
+  const btnClear1 = document.getElementById('btnClear1');
+  const btnMenu1 = document.getElementById('btnMenu1');
+
+  const btnConfirm2 = document.getElementById('btnConfirm2');
+  const btnClear2 = document.getElementById('btnClear2');
+  const btnMenu2 = document.getElementById('btnMenu2');
+
+  const messageBox = document.getElementById('messageBox');
+  const msgDesc = document.getElementById('msgDesc');
+  const msgEmotions = document.getElementById('msgEmotions');
+  const msgBtn = document.getElementById('msgBtn');
+
+  const soundCorrect = document.getElementById('soundCorrect');
+  const soundError = document.getElementById('soundError');
+
+  const MAX_ROUNDS = 30;
+  const cardEmojis = ['🚗', '🚚', '🚜', '🚒', '🚙'];
+
+  // Variáveis Nível 1
+  let playerName1 = '';
+  let currentRound1 = 0;
+  let correctAnswers1 = 0;
+  let errorAnswers1 = 0;
+  let numbers1 = [];
+  let pranchetaState1 = [];
+
+  // Variáveis Nível 2
+  let playerName2 = '';
+  let currentRound2 = 0;
+  let correctAnswers2 = 0;
+  let errorAnswers2 = 0;
+  let numbers2 = [];
+  let pranchetaState2 = [];
+
+  // Função para mostrar só uma tela
+  function showScreen(screen) {
+    menuSection.classList.remove('active');
+    gameLevel1Section.classList.remove('active');
+    gameLevel2Section.classList.remove('active');
+    screen.classList.add('active');
+  }
+
+  // Gera números aleatórios para o nível 1 (0 a 10)
+  function generateNumbersLevel1() {
+    const arr = [];
+    for(let i=0; i<MAX_ROUNDS; i++) {
+      arr.push(Math.floor(Math.random() * 11)); // 0 a 10
+    }
+    return arr;
+  }
+
+  // Gera números aleatórios para o nível 2 (1 a 20)
+  function generateNumbersLevel2() {
+    const arr = [];
+    for(let i=0; i<MAX_ROUNDS; i++) {
+      arr.push(Math.floor(Math.random() * 20) + 1); // 1 a 20
+    }
+    return arr;
+  }
+
+  // Atualiza prancheta
+  function updatePrancheta(pranchetaElem, pranchetaState) {
+    pranchetaElem.innerHTML = '';
+    for(let i=0; i < pranchetaState.length; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'prancheta-cell';
+      if(pranchetaState[i] === '') {
+        cell.classList.add('empty');
+        cell.textContent = '';
+      } else {
+        cell.textContent = pranchetaState[i];
+      }
+      cell.tabIndex = 0;
+      // Remover figura ao clicar na célula
+      cell.addEventListener('click', () => {
+        pranchetaState[i] = '';
+        updatePrancheta(pranchetaElem, pranchetaState);
+      });
+      pranchetaElem.appendChild(cell);
+    }
+  }
+
+  // Conta cartas na prancheta
+  function countCards(pranchetaState) {
+    return pranchetaState.filter(c => c !== '').length;
+  }
+
+  // Adiciona carta na prancheta no primeiro espaço vazio
+  function addCard(pranchetaState, emoji, pranchetaElem) {
+    const emptyIndex = pranchetaState.indexOf('');
+    if(emptyIndex !== -1) {
+      pranchetaState[emptyIndex] = emoji;
+      updatePrancheta(pranchetaElem, pranchetaState);
+    }
+  }
+
+  // Limpa prancheta
+  function clearPrancheta(pranchetaState, pranchetaElem) {
+    for(let i=0; i<pranchetaState.length; i++) {
+      pranchetaState[i] = '';
+    }
+    updatePrancheta(pranchetaElem, pranchetaState);
+  }
+
+  // Mostra mensagem popup
+  function showMessage(text, emotions, isSuccess, callback) {
+    msgDesc.textContent = text;
+    msgEmotions.textContent = emotions;
+    messageBox.style.display = 'block';
+    messageBox.focus();
+
+    if (isSuccess) {
+      soundCorrect.currentTime = 0;
+      soundCorrect.play();
+    } else {
+      soundError.currentTime = 0;
+      soundError.play();
+    }
+
+    msgBtn.onclick = () => {
+      messageBox.style.display = 'none';
+      callback();
+    };
+  }
+
+  // Função que finaliza o jogo e mostra a mensagem final
+  function finishGame(level) {
+    let correct, total, section;
+    if(level === 1) {
+      correct = correctAnswers1;
+      total = MAX_ROUNDS;
+      section = gameLevel1Section;
+    } else {
+      correct = correctAnswers2;
+      total = MAX_ROUNDS;
+      section = gameLevel2Section;
+    }
+    const percent = (correct / total) * 100;
+    let msg = '';
+    let emotions = '';
+    if(percent >= 60) {
+      msg = `Parabéns! Você acertou ${percent.toFixed(0)}%. Excelente trabalho! 🎉🎉🎉`;
+      emotions = '🎉👏👍🎊';
+    } else {
+      msg = `Você acertou ${percent.toFixed(0)}%. Não desista! Continue tentando e você vai melhorar! 💪😊`;
+      emotions = '💪😊✨';
+    }
+    showMessage(msg, emotions, true, () => {
+      showScreen(menuSection);
+      playerNameInput.focus();
+    });
+  }
+
+  // Iniciar jogo nível 1
+  function startGameLevel1() {
+    const name = playerNameInput.value.trim();
+    if(name === '') {
+      alert('Por favor, digite seu nome antes de iniciar o jogo.');
+      playerNameInput.focus();
+      return;
+    }
+    playerName1 = name;
+    currentRound1 = 0;
+    correctAnswers1 = 0;
+    errorAnswers1 = 0;
+    numbers1 = generateNumbersLevel1();
+    pranchetaState1 = Array(10).fill(''); // 2 linhas x 5 colunas = 10
+    updatePrancheta(prancheta1, pranchetaState1);
+    playerNameDisplay1.textContent = `Jogador: ${playerName1}`;
+    correctCount1.textContent = '0';
+    errorCount1.textContent = '0';
+    currentNumber1.textContent = numbers1[currentRound1];
+    showScreen(gameLevel1Section);
+    playerNameInput.value = '';
+  }
+
+  // Iniciar jogo nível 2
+  function startGameLevel2() {
+    const name = playerNameInput.value.trim();
+    if(name === '') {
+      alert('Por favor, digite seu nome antes de iniciar o jogo.');
+      playerNameInput.focus();
+      return;
+    }
+    playerName2 = name;
+    currentRound2 = 0;
+    correctAnswers2 = 0;
+    errorAnswers2 = 0;
+    numbers2 = generateNumbersLevel2();
+    pranchetaState2 = Array(20).fill(''); // 4 linhas x 5 colunas = 20
+    updatePrancheta(prancheta2, pranchetaState2);
+    playerNameDisplay2.textContent = `Jogador: ${playerName2}`;
+    correctCount2.textContent = '0';
+    errorCount2.textContent = '0';
+    currentNumber2.textContent = numbers2[currentRound2];
+    showScreen(gameLevel2Section);
+    playerNameInput.value = '';
+  }
+
+  // Confirma resposta nível 1
+  function confirmAnswerLevel1() {
+    const expected = numbers1[currentRound1];
+    const count = countCards(pranchetaState1);
+    if(count === expected) {
+      correctAnswers1++;
+      showMessage('Parabéns, você acertou!', '🎉🎉🎉', true, nextRoundLevel1);
+    } else {
+      errorAnswers1++;
+      showMessage(`Você errou. A quantidade correta era ${expected}.`, '❌😞', false, nextRoundLevel1);
+    }
+  }
+
+  // Próxima rodada nível 1
+  function nextRoundLevel1() {
+    currentRound1++;
+    correctCount1.textContent = correctAnswers1;
+    errorCount1.textContent = errorAnswers1;
+    clearPrancheta(pranchetaState1, prancheta1);
+    if(currentRound1 >= MAX_ROUNDS) {
+      finishGame(1);
+      return;
+    }
+    currentNumber1.textContent = numbers1[currentRound1];
+  }
+
+  // Confirma resposta nível 2
+  function confirmAnswerLevel2() {
+    const expected = numbers2[currentRound2];
+    const count = countCards(pranchetaState2);
+    if(count === expected) {
+      correctAnswers2++;
+      showMessage('Parabéns, você acertou!', '🎉🎉🎉', true, nextRoundLevel2);
+    } else {
+      errorAnswers2++;
+      showMessage(`Você errou. A quantidade correta era ${expected}.`, '❌😞', false, nextRoundLevel2);
+    }
+  }
+
+  // Próxima rodada nível 2
+  function nextRoundLevel2() {
+    currentRound2++;
+    correctCount2.textContent = correctAnswers2;
+    errorCount2.textContent = errorAnswers2;
+    clearPrancheta(pranchetaState2, prancheta2);
+    if(currentRound2 >= MAX_ROUNDS) {
+      finishGame(2);
+      return;
+    }
+    currentNumber2.textContent = numbers2[currentRound2];
+  }
+
+  // Adiciona cartas para nível 1 (5 cartas)
+  function setupCardsLevel1() {
+    cardsContainer1.innerHTML = '';
+    cardEmojis.forEach(emoji => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.textContent = emoji;
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Carta de veículo ${emoji}`);
+      card.addEventListener('click', () => {
+        addCard(pranchetaState1, emoji, prancheta1);
+      });
+      card.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          addCard(pranchetaState1, emoji, prancheta1);
+        }
+      });
+      cardsContainer1.appendChild(card);
+    });
+  }
+
+  // Adiciona cartas para nível 2 (5 cartas)
+  function setupCardsLevel2() {
+    cardsContainer2.innerHTML = '';
+    cardEmojis.forEach(emoji => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.textContent = emoji;
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Carta de veículo ${emoji}`);
+      card.addEventListener('click', () => {
+        addCard(pranchetaState2, emoji, prancheta2);
+      });
+      card.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          addCard(pranchetaState2, emoji, prancheta2);
+        }
+      });
+      cardsContainer2.appendChild(card);
+    });
+  }
+
+  // Números girando em círculo no menu
+  function setupCircleNumbers() {
+    const container = document.getElementById('circleNumbers');
+    container.innerHTML = '';
+    const radius = 80;
+    const centerX = 90;
+    const centerY = 90;
+    for(let i=0; i<=10; i++) {
+      const angle = (i / 11) * 2 * Math.PI - Math.PI / 2; // distribuir no círculo
+      const x = centerX + radius * Math.cos(angle) - 15;
+      const y = centerY + radius * Math.sin(angle) - 15;
+      const numDiv = document.createElement('div');
+      numDiv.textContent = i;
+      numDiv.style.left = `${x}px`;
+      numDiv.style.top = `${y}px`;
+      container.appendChild(numDiv);
+    }
+  }
+
+  // Eventos de botões
+  document.getElementById('btnLevel1').addEventListener('click', () => {
+    startGameLevel1();
+  });
+  document.getElementById('btnLevel2').addEventListener('click', () => {
+    startGameLevel2();
+  });
+  btnConfirm1.addEventListener('click', confirmAnswerLevel1);
+  btnClear1.addEventListener('click', () => clearPrancheta(pranchetaState1, prancheta1));
+  btnMenu1.addEventListener('click', () => showScreen(menuSection));
+
+  btnConfirm2.addEventListener('click', confirmAnswerLevel2);
+  btnClear2.addEventListener('click', () => clearPrancheta(pranchetaState2, prancheta2));
+  btnMenu2.addEventListener('click', () => showScreen(menuSection));
+
+  msgBtn.addEventListener('click', () => {
+    messageBox.style.display = 'none';
+  });
+
+  // Inicializações
+  setupCardsLevel1();
+  setupCardsLevel2();
+  setupCircleNumbers();
+
+  // Começa mostrando só o menu
+  showScreen(menuSection);
+  playerNameInput.focus();
+
+})();
+</script>
+</body>
+</html>
